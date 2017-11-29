@@ -24,6 +24,8 @@ class Solution:
             sell1[i] = max([sell1[i - 1], buy1[i - 1] + prices[i]])
             buy2[i] = max([buy2[i - 1], sell1[i - 1] - prices[i]])
             sell2[i] = max([sell2[i - 1], buy2[i - 1] + prices[i]])
+        print(sell1)
+        print(sell2)
         return max(sell1[-1], sell2[-1])
 
 class MaxRorofitTestCase(unittest.TestCase):

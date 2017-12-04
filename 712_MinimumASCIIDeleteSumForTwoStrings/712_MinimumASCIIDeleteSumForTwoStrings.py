@@ -8,8 +8,8 @@ class Solution:
         :type s2: str
         :rtype: int
         """
-        s1_value = [ord(s1[i - 1]) for i in range(len(s1))]
-        s2_value = [ord(s2[i - 1]) for i in range(len(s2))]
+        s1_value = [ord(s1[i]) for i in range(len(s1))]
+        s2_value = [ord(s2[i]) for i in range(len(s2))]
 
         row_num = len(s1)
         column_num = len(s2)
@@ -21,8 +21,6 @@ class Solution:
             return sum(s1_value)
         row_num += 1
         column_num += 1
-        print(s1_value)
-        print(s2_value)
         distance = [[0 for j in range(column_num)] for i in range(row_num)]
         distance[0][0] = 0
         for i in range(1, row_num):
@@ -32,12 +30,12 @@ class Solution:
         for i in range(1, row_num):
             for j in range(1, column_num):
                 diff = 0 if s1_value[i - 1] == s2_value[j - 1] else s1_value[i - 1] + s2_value[j - 1]
-                distance[i][j] = min([distance[i-1][j-1] + diff, distance[i][j - 1] + s2_value[j - 1], distance[i - 1][j] + s1_value[i - 1]])
-        print(distance)
+                distance[i][j] = min([distance[i - 1][j - 1] + diff, distance[i][j - 1] + s2_value[j - 1],
+                                      distance[i - 1][j] + s1_value[i - 1]])
         return distance[-1][-1]
 
 
-class MinimunASCII(unittest.TestCase):
+class MinimunASCIITest(unittest.TestCase):
     def testMinimunDeleteSum(self):
         test = Solution()
         self.assertEqual(test.minimumDeleteSum('sea', 'eat'), 231)

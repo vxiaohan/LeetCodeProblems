@@ -8,33 +8,61 @@ class Solution:
         :type k: int
         :rtype: List[int]
         """
-        sum_value = [sum(nums[i:i + k]) for i in range(len(nums) + 1 - k)]
-        if len(nums) > 100 * k:
-            max_three = [0] * 3
-            max_three_index = [0] * 3
-            for i in range(len(sum_value)):
-                if sum_value[i] > min(max_three):
-                    updated = False
-                    for j in range(3):
-                        if i - max_three_index[j] < k:
-                            if max_three[j] < sum_value[i]:
-                                max_three[j] = sum_value[i]
-                                max_three_index[j] = i
-                                updated = True
-                                break
-                            else:
-                                updated = True
-                                break
-                    if not updated:
-                        current_min = min(max_three)
-                        for j in range(3):
-                            if max_three[j] == current_min:
-                                max_three[j] = sum_value[i]
-                                max_three_index[j] = i
-                                break
-            list.sort(max_three_index)
-            return max_three_index
+        if len(nums) <= 3 * k:
+            return sum(nums)
 
+        sum_value = [0] * (len(nums) + 1 - k)
+        sum_value[0] = sum(nums[:k])
+        for i in range(1, len(nums) + 1 - k):
+            sum_value[i] = sum_value[i - 1] - nums[i - 1] + nums[i + k - 1]
+        max_sum_value_left = [0] * len(sum_value)
+        max_sum_index_left = [0] * len(sum_value)
+        max_sum_value_right = [0] * len(sum_value)
+        max_sum_index_right = [0] * len(sum_value)
+        max_sum_value_temp = 0
+        for i in range(len(sum_value)):
+            if sum_value[i] > max_sum_value_temp:
+                max_sum_value_temp = sum_value[i]
+                max_sum_value_left[i] = max_sum_value_temp
+                max_sum_index_left[i] = i
+            else:
+                max_sum_value_left[i] = max_sum_value_temp
+                max_sum_index_left[i] = max_sum_index_left[i - 1]
+        max_sum_value_temp = 0
+        for i in range(len(sum_value) - 1, -1, -1):
+            if sum_value[i] > max_sum_value_temp:
+                max_sum_value_temp = sum_value[i]
+                max_sum_value_right[i] = max_sum_value_temp
+                max_sum_index_right[i] = i
+            else:
+                max_sum_value_right[i] = max_sum_value_temp
+                max_sum_index_right[i] = max_sum_index_right[i + 1]
+
+        dp = 0
+        dp_max = 0
+        dp_max_index = [0] * 3
+        left_max = 0
+        right_max = 0
+        for i in range(k, len(nums) - k - k + 1):
+            left_max = max_sum_value_left[i - k]
+            right_max = max_sum_value_right[i + k]
+            dp = sum_value[i] + left_max + right_max
+            if dp > dp_max:
+                dp_max = dp
+                dp_max_index[0] = max_sum_index_left[i - k]
+                dp_max_index[1] = i
+                dp_max_index[2] = max_sum_index_right[i + k]
+        return dp_max_index
+
+    '''
+    # Timeout
+    def maxSumOfThreeSubarrays(self, nums, k):
+        """
+        :type nums: List[int]
+        :type k: int
+        :rtype: List[int]
+        """
+        sum_value = [sum(nums[i:i + k]) for i in range(len(nums) + 1 - k)]
         dp = [[0 for j in range(k + 1)] for i in range(4)]
         dp[1][k - 1] = sum_value[0]
         path = [[[0] * 4 for i in range(4)] for j in range(k + 1)]
@@ -59,18 +87,18 @@ class Solution:
                 max_index = m
                 max_value = dp[m][(len(nums) - 1) % (k + 1)]
         return path[(len(nums) - 1) % (k + 1)][max_index][1:]
+        '''
 
 
 class TestMaxSum(unittest.TestCase):
     def testMaxSumOfThreeSubarrays(self):
         test = Solution()
-        '''
+
         self.assertEqual(test.maxSumOfThreeSubarrays([1, 2, 1, 2, 6, 7, 5, 1], 2), [0, 3, 5])
         self.assertEqual(
             test.maxSumOfThreeSubarrays([17, 8, 14, 11, 13, 9, 4, 19, 20, 6, 1, 20, 6, 5, 19, 8, 5, 16, 20, 17], 5),
             [0, 7, 14])
         self.assertEqual(test.maxSumOfThreeSubarrays([7, 13, 20, 19, 19, 2, 10, 1, 1, 19], 3), [1, 4, 7])
-        '''
         self.assertEqual(test.maxSumOfThreeSubarrays(
             [9198, 35093, 23994, 30373, 34518, 60660, 64230, 26421, 57201, 9885, 3837, 29428, 12357, 17212, 22590,
              38805, 17195, 18748, 2613, 28135, 44278, 61388, 49331, 43858, 3899, 35158, 2504, 41798, 24753, 34657,
